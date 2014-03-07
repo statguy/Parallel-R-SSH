@@ -13,6 +13,7 @@ import optparse
 import os
 from subprocess import Popen
 import time
+import sys
 
 class Node(object):
     def __init__(self, host, load):
@@ -58,7 +59,8 @@ class Cluster(object):
         self.get_remote_nodes()
         self.filter_nodes(max_nodes, max_load, blacklist)
         if (len(self.nodes) == 0):
-            die("No cluster nodes available.")
+            print "No cluster nodes available."
+            sys.exit(-1)
         return self.nodes
 
     running_tasks = []
@@ -125,7 +127,7 @@ class CSCluster(Cluster):
             m = self.entry.match(l)
             if m is not None:
                 host, slot, ping, ssh, users, load, stat, kernel, bios, comment = m.groups()
-                if stat != 'ok':
+                if stat != 'ok' and stat != 'cs':
                     continue
                 if ping != 'yes' or ssh != 'yes' or load is None:
                     continue
@@ -146,18 +148,16 @@ def main():
 
     parser = optparse.OptionParser("usage: %prog options [options] call")
 
-    parser.add_option("-n", "--number_of_tasks", metavar="TASKS", dest="number_of_tasks", type="int", help="number of tasks to execute")
+    parser.add_option("-n", "--number_of_tasks", metavar="TASKS", dest="n_tasks", type="int", help="number of tasks to execute")
     parser.add_option("-m", "--max_nodes", metavar="NODES", dest="max_nodes", default=2, type="int", help="maximum number nodes to allocate")
     parser.add_option("-l", "--max_load", metavar="LOAD", dest="max_load", default=10.0, type="float", help="maximum load allowed in nodes for allocation")
     parser.add_option("-f", "--log_dir", metavar="DIR", dest="log_file_dir", default="~/tmp", type="string", help="directory to write log files")
     parser.add_option("-b", "--blacklist", metavar="FILE", dest="blacklist_file", type="string", help="file of blacklisted nodes")
     parser.add_option("-v", "--verbose", dest="verbose", default=False, action="store_true", help="print verbose messages")
 
-    (options, args) = parser.parse_args()
-    if (options.number_of_tasks is None):
-        parser.error("-n is missing")
+    (options, args) = parser.parse_args()        
     blacklist = []
-    if (options.blacklist_file is not None):
+    if options.blacklist_file is not None:
         blacklist = [line.strip() for line in open(options.blacklist_file, "r")]
 
     if len(args) == 0:
@@ -165,8 +165,14 @@ def main():
     remote_call = " ".join(args)
 
     cluster = CSCluster(options.verbose)
-    cluster.get_nodes(min(options.number_of_tasks, options.max_nodes), options.max_load, blacklist)
-    cluster.run_tasks(options.number_of_tasks, remote_call, options.log_file_dir)
+
+    if options.n_tasks is None:
+        print "Argument -n TASKS not specified, priting only available clusters:"
+        cluster.get_nodes(options.max_nodes, options.max_load, blacklist)
+        print cluster.nodes
+    else:
+        cluster.get_nodes(min(options.n_tasks, options.max_nodes), options.max_load, blacklist)
+        cluster.run_tasks(options.n_tasks, remote_call, options.log_file_dir)
 
     return
 
