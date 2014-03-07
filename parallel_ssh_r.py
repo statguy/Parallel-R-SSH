@@ -96,7 +96,7 @@ class Cluster(object):
                     print "Task " + str(task_id) + " at " + host + " terminated with return code " + str(return_code) + "."
                     if return_code == 255:
                         print "*** UNABLE TO CONNECT TO HOST " + host + ", TASK " + str(task_id) + " FAILED *** "
-                    else if self.last_running_task_id < n_tasks:
+                    elif self.last_running_task_id < n_tasks:
                         self.run_task(self.last_running_task_id + 1, host, remote_call, log_file_dir)
             time.sleep(1)
         
