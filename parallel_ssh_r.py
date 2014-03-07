@@ -66,9 +66,9 @@ class Cluster(object):
     running_tasks = []
     last_running_task_id = 0
 
-    def run_task(self, task_id, host, remote_call, log_file_dir):
+    def run_task(self, task_id, host, batch_file, arguments, log_file_dir):
         log_file = log_file_dir + "/task-" + str(task_id) + ".log"
-        command = "ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no " + host + " \"Rscript " + remote_call + " " + str(task_id) + " > " + log_file + " 2>&1\""
+        command = "ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no " + host + " \"R --vanilla --args " + arguments + " " + str(task_id) + " < " + batch_file + " > " + log_file + " 2>&1\""
 
         print "Starting task " + str(task_id) + " at " + host + "..."
         print "Output will be written to " + log_file + " at the remote node."
@@ -80,13 +80,13 @@ class Cluster(object):
 
         return
 
-    def run_tasks(self, n_tasks, remote_call, log_file_dir):
+    def run_tasks(self, n_tasks, batch_file, arguments, log_file_dir):
         print "Running " + str(n_tasks) + " tasks on " + str(len(self.nodes)) + " remote nodes:"
         print "".join([i.host + " " for i in self.nodes])
 
         n_new_tasks = min(n_tasks, len(self.nodes))
         for i in range(0, n_new_tasks):
-            self.run_task(i + 1, self.nodes[i].host, remote_call, log_file_dir)
+            self.run_task(i + 1, self.nodes[i].host, batch_file, arguments, log_file_dir)
 
         while self.running_tasks:
             for task_id, task_process, host in self.running_tasks:
@@ -148,7 +148,7 @@ def main():
     #nodes[:] = (i for i in nodes if i.host not in blacklist)
     #print nodes
 
-    parser = optparse.OptionParser("usage: %prog options [options] call")
+    parser = optparse.OptionParser("usage: %prog options [options] batch_file [arguments]")
 
     parser.add_option("-n", "--number_of_tasks", metavar="TASKS", dest="n_tasks", type="int", help="number of tasks to execute")
     parser.add_option("-m", "--max_nodes", metavar="NODES", dest="max_nodes", default=2, type="int", help="maximum number nodes to allocate")
@@ -163,8 +163,11 @@ def main():
         blacklist = [line.strip() for line in open(options.blacklist_file, "r")]
 
     if len(args) == 0:
-        parser.error("call is missing")
-    remote_call = " ".join(args)
+        parser.error("batch_file is missing")
+    batch_file = args[0]
+    arguments = ""
+    if len(args) > 1:
+      arguments = " ".join(args[1:len(args)])
 
     cluster = CSCluster(options.verbose)
 
@@ -174,7 +177,7 @@ def main():
         print cluster.nodes
     else:
         cluster.get_nodes(min(options.n_tasks, options.max_nodes), options.max_load, blacklist)
-        cluster.run_tasks(options.n_tasks, remote_call, options.log_file_dir)
+        cluster.run_tasks(options.n_tasks, batch_file, arguments, options.log_file_dir)
 
     return
 
