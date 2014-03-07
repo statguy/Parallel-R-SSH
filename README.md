@@ -1,15 +1,36 @@
-Parallel R SSH
-==============
+Independent parallel task execution with R on a HPC
+===================================================
 
-Runs multiple R sessions by executing remote script in Ukko cluster via SSH.
-If the number of tasks > number of available remote nodes, tasks are queued and
-nodes are recycled. Run example:
+Runs independent parallel R sessions by executing remote script in Ukko cluster via SSH.
+If the number-of-tasks > number-of-available-remote-nodes, tasks are queued and
+nodes are recycled. Unresponsive nodes are dropped. Task id is appended as the last
+argument for R.
+
+Usage
+-----
+
+Runs test.R in the remote hosts with task ids 1,2,3 and 5 on 2 nodes with maximum load 10.0:
 ```bash
-parallel_ssh_r.py -n 10 -m 5 -l 10.0 -b blacklist.txt -v test.R
+parallel_r.py -t 1:3,5 -m 2 -l 10.0 -b blacklist.txt -v test.R
 ```
 Optional `blacklist.txt` contains unavailable hosts separated by new lines.
-Task number is appended as the last argument for R.
+See `parallel_r.py --help` for more details.
 
-Contact
--------
+```bash
+kill_r.py
+```
+Kills all your R processes in all hosts.
+
+Extending
+---------
+The class in `hpc_cluster.py` can be extended for other HPC clusters, see
+`ukko_cluster.py`.
+
+TODO
+----
+* Allow specifying remote username, port etc.
+* Allow running other programs than R.
+
+Feedback
+--------
 Jussi Jousimo, jvj@iki.fi
