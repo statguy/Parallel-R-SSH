@@ -1,9 +1,6 @@
 # By Jussi Jousimo, jvj@iki.fi
-# Some code taken from Jukka Suomela, https://github.com/suomela/ukko
 
 import abc
-import re
-import urllib2
 import subprocess
 import time
 import sys
@@ -57,7 +54,7 @@ class Cluster(object):
         return self.nodes
 
     running_tasks = []
-    last_running_task_id = 0
+    #last_running_task_id = 0
 
     def run_task(self, task_id, host, batch_file, arguments, log_file_dir):
         log_file = log_file_dir + "/task-" + str(task_id) + ".log"
@@ -68,32 +65,44 @@ class Cluster(object):
         print "Output will be written to " + log_file + " at the remote node."
         if (self.verbose): print command
 
-        self.last_running_task_id = task_id
+        #self.last_running_task_id = task_id
         task_process = subprocess.Popen(command, shell=True)
         self.running_tasks.append((task_id, task_process, host))
 
         return
 
-    def run_tasks(self, n_tasks, batch_file, arguments, log_file_dir):
-        print "Running " + str(n_tasks) + " tasks on " + str(len(self.nodes)) + " remote nodes:"
+    def run_tasks(self, task_ids, batch_file, arguments, log_file_dir):
+        print "Running " + str(len(task_ids)) + " tasks:"
+        print task_ids
+        print "on " + str(len(self.nodes)) + " remote nodes:"
         print "".join([i.host + " " for i in self.nodes])
 
-        n_new_tasks = min(n_tasks, len(self.nodes))
+        n_new_tasks = min(len(task_ids), len(self.nodes))
         for i in range(0, n_new_tasks):
-            self.run_task(i + 1, self.nodes[i].host, batch_file, arguments, log_file_dir)
+            self.run_task(task_ids[i], self.nodes[i].host, batch_file, arguments, log_file_dir)
+
+        failed_hosts = []
 
         while self.running_tasks:
             for task_id, task_process, host in self.running_tasks:
                 return_code = task_process.poll()
                 if return_code is not None:
-                    self.running_tasks.remove((task_id, task_process, host))
                     print "Task " + str(task_id) + " at " + host + " terminated with return code " + str(return_code) + "."
+                    self.running_tasks.remove((task_id, task_process, host))
                     if return_code == 255:
-                        print "*** UNABLE TO CONNECT TO HOST " + host + ", TASK " + str(task_id) + " FAILED *** "
-                        # TODO: remove host, rerun task
-                    elif self.last_running_task_id < n_tasks:
-                        self.run_task(self.last_running_task_id + 1, host, batch_file, arguments, log_file_dir)
-            time.sleep(1)        
+                        print "*** UNABLE TO CONNECT TO HOST " + host + " FOR TASK " + str(task_id) + " ***"
+                        failed_hosts.append(host)
+                    else:
+                        task_ids.remove(task_id)
+                        if len(task_ids) > 0:
+                            self.run_task(task_ids.popleft(), host, batch_file, arguments, log_file_dir)
+            time.sleep(1)
+        
+        if len(task_ids) > 0:
+            print "Failed to complete the tasks:"
+            print task_ids
+            print "on hosts:"
+            print failed_hosts
 
         return
 
@@ -114,39 +123,4 @@ class Cluster(object):
                     print host + " done with return code " + str(return_code) + "."
             time.sleep(1)
 
-        return
-
-
-class CSCluster(Cluster):
-    entry = re.compile(r'''
-        ^(ukko[0-9]+\.hpc\.cs\.helsinki\.fi) \s+
-        ([0-9]+) \s+  # slot
-        (yes|no) \s+  # ping
-        (yes|no) \s+  # ssh
-        ([0-9]+) \s+  # users
-        (?:([0-9]+\.[0-9]+)|-) \s+  # load
-        (cs|rr|ok)(?:/t)? \s+  # stat
-        (N/A|[0-9.-]+-(?:generic|server))? \s+  # kernel
-        ([0-9.]+|--) \s*  # BIOS
-        (.*?) \s* $
-        ''', re.X)
-    
-    def __init__(self, verbose, url=None):
-        super(self.__class__, self).__init__(verbose)
-        self.url = url if url is not None else 'http://www.cs.helsinki.fi/ukko/hpc-report.txt'
-
-    def get_remote_nodes(self):
-        if (self.verbose):
-            print "Retrieving remote nodes list from", self.url + "..."
-        f = urllib2.urlopen(self.url)
-        
-        for l in f:
-            m = self.entry.match(l)
-            if m is not None:
-                host, slot, ping, ssh, users, load, stat, kernel, bios, comment = m.groups()
-                if stat != 'ok' and stat != 'cs':
-                    continue
-                if ping != 'yes' or ssh != 'yes' or load is None:
-                    continue
-                self.nodes.append(Node(host, load))
         return

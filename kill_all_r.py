@@ -1,10 +1,10 @@
 #!/usr/bin/python
 # By Jussi Jousimo, jvj@iki.fi
 
-import hpc_cluster
+import ukko_cluster
 
 def main():
-    cluster = hpc_cluster.CSCluster(True)
+    cluster = ukko_cluster.UkkoCluster(True)
 
     cluster.get_nodes()
     cluster.run_command("killall -s SIGKILL R")
