@@ -4,7 +4,7 @@
 # https://github.com/suomela/ukko
 #
 # Example run:
-# parallel_ssh_r.py -n 10 -m 5 -l 10.0 -b blacklist.txt -v "script.R"
+# parallel_ssh_r.py -n 10 -m 5 -l 10.0 -b blacklist.txt -v test.R
 
 import abc
 import re
