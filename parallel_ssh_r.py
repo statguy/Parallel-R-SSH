@@ -69,8 +69,8 @@ class Cluster(object):
         command = "ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no " + host + " \"Rscript " + remote_call + " " + str(task_id) + " > " + log_file + " 2>&1\""
 
         print "Starting task " + str(task_id) + " at " + host + "..."
-        print "Output written to " + log_file + " at the remote node."
-        print command
+        print "Output will be written to " + log_file + " at the remote node."
+        if (self.verbose) print command
 
         self.last_running_task_id = task_id
         task_process = Popen(command, shell=True)
