@@ -70,7 +70,7 @@ class Cluster(object):
 
         print "Starting task " + str(task_id) + " at " + host + "..."
         print "Output will be written to " + log_file + " at the remote node."
-        if (self.verbose) print command
+        if (self.verbose): print command
 
         self.last_running_task_id = task_id
         task_process = Popen(command, shell=True)
