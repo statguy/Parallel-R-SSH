@@ -9,11 +9,11 @@ argument for R.
 Usage
 -----
 
-Runs test.R in the remote hosts with task ids 1,2,3 and 5 on 2 nodes with maximum load 10.0:
+Runs test.R in the remote hosts with task ids 1,2,3 and 5 on two nodes with maximum load 10.0:
 ```bash
-parallel_r.py -t 1:3,5 -m 2 -l 10.0 -b blacklist.txt -v test.R
+parallel_r.py -t 1:3,5 -n 2 -l 10.0 -b blacklist.txt -v test.R
 ```
-Optional `blacklist.txt` contains unavailable hosts separated by new lines.
+The file `blacklist.txt` contains unavailable hosts separated by new lines.
 See `parallel_r.py --help` for more details.
 
 ```bash
