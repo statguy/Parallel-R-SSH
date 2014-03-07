@@ -7,7 +7,7 @@ def main():
     cluster = hpc_cluster.CSCluster(True)
 
     cluster.get_nodes()
-    cluster.run_command("killall -s SIGKILL R")
+    cluster.run_command("ps -C R")
 
     return
 
