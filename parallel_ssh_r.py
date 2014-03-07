@@ -1,10 +1,6 @@
 #!/usr/bin/python
-#
-# Some code taken from Jukka Suomela,
-# https://github.com/suomela/ukko
-#
-# Example run:
-# parallel_ssh_r.py -n 10 -m 5 -l 10.0 -b blacklist.txt -v test.R
+# By Jussi Jousimo, jvj@iki.fi
+# Some code taken from Jukka Suomela, https://github.com/suomela/ukko
 
 import abc
 import re
@@ -137,17 +133,6 @@ class CSCluster(Cluster):
         return
 
 def main():
-
-    #nodes = []
-    #nodes.append(Node("a", 1))
-    #nodes.append(Node("b", 1))
-    #nodes.append(Node("c", 1))
-    #nodes.append(Node("d", 1))
-    #blacklist = ["b", "d"]
-    #print nodes
-    #nodes[:] = (i for i in nodes if i.host not in blacklist)
-    #print nodes
-
     parser = optparse.OptionParser("usage: %prog options [options] batch_file [arguments]")
 
     parser.add_option("-n", "--number_of_tasks", metavar="TASKS", dest="n_tasks", type="int", help="number of tasks to execute")
