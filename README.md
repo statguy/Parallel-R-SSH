@@ -15,6 +15,7 @@ nodes are recycled.
 The pool can be configured to hold extra nodes for later use.
 * Number of nodes in the pool can be limited.
 * Nodes can be filtered by maximum allowed load and a blacklist of hosts.
+* Output (stdout, stderr) is redirected to log files in remote nodes.
 
 Usage
 -----
