@@ -85,12 +85,9 @@ class Cluster(object):
         available_hosts = [i.host for i in self.nodes]
         print available_hosts
 
-        n_new_tasks = min(len(task_ids), len(self.nodes))
+        n_new_tasks = min(len(task_ids), len(available_hosts))
         for i in range(0, n_new_tasks):
-            self.run_task(task_ids[i], self.nodes[i].host, batch_file, arguments, log_file_dir)
-            available_hosts.remove(self.nodes[i].host)
-        task_ids_to_remove = [task_ids[i] for i in range(0, n_new_tasks)]
-        task_ids[:] = [i for i in task_ids if i not in task_ids_to_remove]
+            self.run_task(task_ids.pop(), available_hosts.pop(), batch_file, arguments, log_file_dir)
 
         failed_hosts = []
 
