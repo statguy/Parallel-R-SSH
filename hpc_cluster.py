@@ -80,6 +80,7 @@ class Cluster(object):
         n_new_tasks = min(len(task_ids), len(self.nodes))
         for i in range(0, n_new_tasks):
             self.run_task(task_ids[i], self.nodes[i].host, batch_file, arguments, log_file_dir)
+            task_ids.pop(i)
 
         failed_hosts = []
 
@@ -92,8 +93,8 @@ class Cluster(object):
                     if return_code == 255:
                         print "*** UNABLE TO CONNECT TO HOST " + host + " FOR TASK " + str(task_id) + " ***"
                         failed_hosts.append(host)
+                        task_ids.append(task_id)
                     else:
-                        task_ids.remove(task_id)
                         if len(task_ids) > 0:
                             self.run_task(task_ids.pop(), host, batch_file, arguments, log_file_dir)
             time.sleep(1)
