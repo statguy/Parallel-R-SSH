@@ -1,9 +1,20 @@
 # By Jussi Jousimo, jvj@iki.fi
 
+import signal
 import abc
 import subprocess
 import time
 import sys
+
+running_tasks = []
+    
+def sigint_handler(signal, frame):
+    for task_id, task_process, host in running_tasks:
+        print "Killing task " + str(task_id) + "..."
+        task_process.kill()
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, sigint_handler)
 
 class Node(object):
     def __init__(self, host, load):
@@ -53,9 +64,6 @@ class Cluster(object):
             sys.exit(-1)
         return self.nodes
 
-    running_tasks = []
-    #last_running_task_id = 0
-
     def run_task(self, task_id, host, batch_file, arguments, log_file_dir):
         log_file = log_file_dir + "/task-" + str(task_id) + ".log"
         command = "nice -n 11 ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no " + host + \
@@ -65,9 +73,8 @@ class Cluster(object):
         print "Output will be written to " + log_file + " at the remote node."
         if (self.verbose): print command
 
-        #self.last_running_task_id = task_id
         task_process = subprocess.Popen(command, shell=True)
-        self.running_tasks.append((task_id, task_process, host))
+        running_tasks.append((task_id, task_process, host))
 
         return
 
@@ -85,13 +92,12 @@ class Cluster(object):
 
         failed_hosts = []
 
-        # TODO: Handle SIGINT by terminating all processes properly
-        while self.running_tasks:
-            for task_id, task_process, host in self.running_tasks:
+        while running_tasks:
+            for task_id, task_process, host in running_tasks:
                 return_code = task_process.poll()
                 if return_code is not None:
                     print "Task " + str(task_id) + " at " + host + " terminated with return code " + str(return_code) + "."
-                    self.running_tasks.remove((task_id, task_process, host))
+                    running_tasks.remove((task_id, task_process, host))
                     if return_code == 255: # Cannot reach host or cannot authenticate
                         print "*** UNABLE TO CONNECT TO HOST " + host + " FOR TASK " + str(task_id) + " ***"
                         failed_hosts.append(host)
@@ -113,6 +119,7 @@ class Cluster(object):
 
         return
 
+    # TODO: handle SIGNIT here too
     def run_command(self, command, timeout=10):
         running_commands = []
         for node in self.nodes:
