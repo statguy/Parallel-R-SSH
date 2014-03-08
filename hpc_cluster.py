@@ -97,6 +97,7 @@ class Cluster(object):
                         failed_hosts.append(host)
                         task_ids.append(task_id)
                     elif return_code == 137: # R was killed in the remote host, retry. TODO: do not retry too many times
+                        print "*** TASK " + str(task_id) + " KILLED IN HOST " + host + ", WILL RETRY ***"
                         self.run_task(task_id, host, batch_file, arguments, log_file_dir)
                     # TODO: Handle other return codes ??
                     else:
