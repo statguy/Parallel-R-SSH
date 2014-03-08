@@ -111,7 +111,7 @@ class Cluster(object):
     def run_command(self, command, timeout=10):
         running_commands = []
         for node in self.nodes:
-            full_command = "ssh -o ConnectTimeout=" + timeout + " -o BatchMode=yes -o StrictHostKeyChecking=no " + \
+            full_command = "ssh -o ConnectTimeout=" + str(timeout) + " -o BatchMode=yes -o StrictHostKeyChecking=no " + \
                 node.host + " \"" + command + "\""
             if (self.verbose): print full_command
             command_process = subprocess.Popen(full_command, shell=True)
