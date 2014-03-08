@@ -1,11 +1,11 @@
 # By Jussi Jousimo, jvj@iki.fi
 # Some code taken from Jukka Suomela, https://github.com/suomela/ukko
 
-import hpc_cluster
+import independent_parallel_tasks
 import re
 import urllib2
 
-class UkkoCluster(hpc_cluster.Cluster):
+class UkkoCluster(independent_parallel_tasks.Cluster):
     entry = re.compile(r'''
         ^(ukko[0-9]+\.hpc\.cs\.helsinki\.fi) \s+
         ([0-9]+) \s+  # slot
