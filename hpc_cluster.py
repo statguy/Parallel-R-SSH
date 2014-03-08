@@ -81,23 +81,26 @@ class Cluster(object):
     def run_tasks(self, task_ids, batch_file, arguments, log_file_dir):
         print "Running " + str(len(task_ids)) + " tasks:"
         print task_ids
-        print "on " + str(len(self.nodes)) + " remote nodes:"
-        print "".join([i.host + " " for i in self.nodes])
+        print "on " + str(len(self.nodes)) + " remote hosts:"
+        available_hosts = [i.host for i in self.nodes]
+        print available_hosts
 
         n_new_tasks = min(len(task_ids), len(self.nodes))
         for i in range(0, n_new_tasks):
             self.run_task(task_ids[i], self.nodes[i].host, batch_file, arguments, log_file_dir)
+            available_hosts.remove(self.nodes[i].host)
         task_ids_to_remove = [task_ids[i] for i in range(0, n_new_tasks)]
         task_ids[:] = [i for i in task_ids if i not in task_ids_to_remove]
 
         failed_hosts = []
 
-        while running_tasks:
+        while len(running_tasks) > 0:
             for task_id, task_process, host in running_tasks:
                 return_code = task_process.poll()
                 if return_code is not None:
                     print "Task " + str(task_id) + " at " + host + " terminated with return code " + str(return_code) + "."
                     running_tasks.remove((task_id, task_process, host))
+
                     if return_code == 255: # Cannot reach host or cannot authenticate
                         print "*** UNABLE TO CONNECT TO HOST " + host + " FOR TASK " + str(task_id) + " ***"
                         failed_hosts.append(host)
@@ -106,18 +109,20 @@ class Cluster(object):
                         print "*** TASK " + str(task_id) + " KILLED IN HOST " + host + " ***"
                         failed_hosts.append(host)
                         task_ids.append(task_id)
-                        #self.run_task(task_id, host, batch_file, arguments, log_file_dir)
                     # TODO: Handle other return codes ??
                     else:
-                        if len(task_ids) > 0:
-                            self.run_task(task_ids.pop(), host, batch_file, arguments, log_file_dir)
+                        available_hosts.append(host)
+
+            if len(task_ids) > 0 and len(available_hosts) > 0:
+                self.run_task(task_ids.pop(), available_hosts.pop(), batch_file, arguments, log_file_dir)
+
             time.sleep(1)
         
         if len(task_ids) > 0:
             print "Failed to complete the tasks:"
-            print task_ids
+            print sorted(task_ids)
             print "on hosts:"
-            print failed_hosts
+            print sorted(failed_hosts)
 
         return
 

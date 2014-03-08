@@ -38,16 +38,16 @@ def main():
         task_ids = []
         for task_item in task_items:
             if task_item.find(":") >= 0:
-                start_end = task_item.split(":")
-                task_ids.extend(range(int(start_end[0]), int(start_end[1]) + 1))
+                from_to = task_item.split(":")
+                task_ids.extend(range(int(from_to[0]), int(from_to[1]) + 1))
             else:
                 task_ids.append(int(task_item))
 
         if len(set(task_ids)) < len(task_ids):
             print "Some task ids occur multiple times."
             sys.exit(-1)
-
-        cluster.get_nodes(min(len(task_ids), options.max_nodes), options.max_load, blacklist)
+        
+        cluster.get_nodes(options.max_nodes, options.max_load, blacklist)
         cluster.run_tasks(task_ids, batch_file, arguments, options.log_file_dir)
 
     return
