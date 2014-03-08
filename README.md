@@ -1,7 +1,7 @@
 Independent parallel task execution with R on a HPC
 ===================================================
 
-Runs independent parallel R sessions by executing remote script in a high
+Runs independent parallel R sessions by executing a remote script in a high
 performance cluster via SSH. The script is currently configured for the
 [Ukko](http://www.cs.helsinki.fi/en/compfac/high-performance-cluster-ukko) cluster.
 
