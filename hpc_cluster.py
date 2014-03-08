@@ -80,7 +80,8 @@ class Cluster(object):
         n_new_tasks = min(len(task_ids), len(self.nodes))
         for i in range(0, n_new_tasks):
             self.run_task(task_ids[i], self.nodes[i].host, batch_file, arguments, log_file_dir)
-            task_ids.pop(i)
+        task_ids_to_remove = [task_ids[i] for i in range(0, n_new_tasks)]
+        task_ids[:] = [i for i in task_ids if i not in task_ids_to_remove]
 
         failed_hosts = []
 
