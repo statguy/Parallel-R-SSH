@@ -12,8 +12,7 @@ Features
 * If the number-of-tasks > number-of-available-remote-nodes, tasks are queued and
 nodes are recycled.
 * A pool of available nodes is maintained and unresponsive/troublesome nodes are removed.
-The pool can be configured to hold extra nodes for later use.
-* Number of nodes in the pool can be limited.
+* Number of nodes in the pool can be limited or extra nodes can be reserved for later use.
 * Nodes can be filtered by maximum allowed load and a blacklist of hosts.
 * Output (stdout, stderr) is redirected to log files in remote nodes.
 
