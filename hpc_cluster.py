@@ -85,16 +85,20 @@ class Cluster(object):
 
         failed_hosts = []
 
+        # TODO: Handle SIGINT by terminating all processes properly
         while self.running_tasks:
             for task_id, task_process, host in self.running_tasks:
                 return_code = task_process.poll()
                 if return_code is not None:
                     print "Task " + str(task_id) + " at " + host + " terminated with return code " + str(return_code) + "."
                     self.running_tasks.remove((task_id, task_process, host))
-                    if return_code == 255:
+                    if return_code == 255: # Cannot reach host or cannot authenticate
                         print "*** UNABLE TO CONNECT TO HOST " + host + " FOR TASK " + str(task_id) + " ***"
                         failed_hosts.append(host)
                         task_ids.append(task_id)
+                    elif return_code == 137: # R was killed in the remote host, retry. TODO: do not retry too many times
+                        self.run_task(task_id, host, batch_file, arguments, log_file_dir)
+                    # TODO: Handle other return codes ??
                     else:
                         if len(task_ids) > 0:
                             self.run_task(task_ids.pop(), host, batch_file, arguments, log_file_dir)
