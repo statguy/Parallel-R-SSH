@@ -95,7 +95,7 @@ class Cluster(object):
                     else:
                         task_ids.remove(task_id)
                         if len(task_ids) > 0:
-                            self.run_task(task_ids.popleft(), host, batch_file, arguments, log_file_dir)
+                            self.run_task(task_ids.pop(), host, batch_file, arguments, log_file_dir)
             time.sleep(1)
         
         if len(task_ids) > 0:
