@@ -25,10 +25,10 @@ parallel_r.py -t 1:3,5 -n 2 -l 10.0 -b blacklist.txt -v test.R
 The file `blacklist.txt` contains excluded hosts separated by new lines.
 See `parallel_r.py --help` for more details.
 
+Kills all your R processes in all remote hosts:
 ```bash
-kill_r.py
+remote_command.py killall -s SIGKILL R
 ```
-Kills all your R processes in all hosts.
 
 Extending
 ---------
