@@ -65,10 +65,10 @@ class Cluster(object):
         return self.nodes
 
     # TODO: ssh arguments
-    def run_task(self, task_id, host, batch_file, arguments, log_file_dir):
+    def run_task(self, task_id, host, batch_file, arguments, log_file_dir, priority):
         log_file = log_file_dir + "/task-" + str(task_id) + ".log"
-        command = "nice -n 11 ssh -tt -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no " + host + \
-            " \"R --vanilla --args " + arguments + " " + str(task_id) + " < " + batch_file + " > " + log_file + " 2>&1\""
+        command = "nice -n " + str(priority) + " ssh -tt -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no " + \
+            host + " \"R --vanilla --args " + arguments + " " + str(task_id) + " < " + batch_file + " > " + log_file + " 2>&1\""
 
         print "Starting task " + str(task_id) + " at " + host + "..."
         print "Output will be written to " + log_file + " at the remote node."
@@ -79,7 +79,7 @@ class Cluster(object):
 
         return
 
-    def run_tasks(self, task_ids, batch_file, arguments, log_file_dir):
+    def run_tasks(self, task_ids, batch_file, arguments, log_file_dir, priority):
         print "Running " + str(len(task_ids)) + " tasks:"
         print task_ids
         print "on " + str(len(self.nodes)) + " remote hosts:"
@@ -88,7 +88,7 @@ class Cluster(object):
 
         n_new_tasks = min(len(task_ids), len(available_hosts))
         for i in range(0, n_new_tasks):
-            self.run_task(task_ids.pop(), available_hosts.pop(), batch_file, arguments, log_file_dir)
+            self.run_task(task_ids.pop(), available_hosts.pop(), batch_file, arguments, log_file_dir, priority)
 
         failed_hosts = []
 
@@ -112,7 +112,7 @@ class Cluster(object):
                         available_hosts.append(host)
 
             if len(task_ids) > 0 and len(available_hosts) > 0:
-                self.run_task(task_ids.pop(), available_hosts.pop(), batch_file, arguments, log_file_dir)
+                self.run_task(task_ids.pop(), available_hosts.pop(), batch_file, arguments, log_file_dir, priority)
 
             time.sleep(1)
         

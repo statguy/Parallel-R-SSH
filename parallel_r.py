@@ -13,6 +13,7 @@ def main():
     parser.add_option("-l", "--max_load", metavar="LOAD", dest="max_load", default=10.0, type="float", help="maximum load allowed in nodes for allocation")
     parser.add_option("-f", "--log_dir", metavar="DIR", dest="log_file_dir", default="~/tmp", type="string", help="directory to write log files")
     parser.add_option("-b", "--blacklist", metavar="FILE", dest="blacklist_file", type="string", help="file of blacklisted nodes")
+    parser.add_option("-p", "--priority", metavar="PRIORITY", dest="priority", default=10, type="int", help="nice priority")    
     parser.add_option("-v", "--verbose", dest="verbose", default=False, action="store_true", help="print verbose messages")
 
     (options, args) = parser.parse_args()        
@@ -48,7 +49,7 @@ def main():
             sys.exit(-1)
         
         cluster.get_nodes(options.max_nodes, options.max_load, blacklist)
-        cluster.run_tasks(task_ids, batch_file, arguments, options.log_file_dir)
+        cluster.run_tasks(task_ids, batch_file, arguments, options.log_file_dir, options.priority)
 
     return
 
