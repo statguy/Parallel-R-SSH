@@ -36,5 +36,5 @@ class UkkoCluster(independent_parallel_tasks.Cluster):
                     continue
                 if ping != 'yes' or ssh != 'yes' or load is None:
                     continue
-                self.nodes.append(hpc_cluster.Node(host, load))
+                self.nodes.append(independent_parallel_tasks.Node(host, load))
         return
