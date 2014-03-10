@@ -67,7 +67,7 @@ class Cluster(object):
     # TODO: ssh arguments
     def run_task(self, task_id, host, batch_file, arguments, log_file_dir):
         log_file = log_file_dir + "/task-" + str(task_id) + ".log"
-        command = "nice -n 11 ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no " + host + \
+        command = "nice -n 11 ssh -tt -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no " + host + \
             " \"R --vanilla --args " + arguments + " " + str(task_id) + " < " + batch_file + " > " + log_file + " 2>&1\""
 
         print "Starting task " + str(task_id) + " at " + host + "..."
@@ -129,7 +129,7 @@ class Cluster(object):
     def run_command(self, command, timeout=10):
         running_commands = []
         for node in self.nodes:
-            full_command = "ssh -o ConnectTimeout=" + str(timeout) + " -o BatchMode=yes -o StrictHostKeyChecking=no " + \
+            full_command = "ssh -tt -o ConnectTimeout=" + str(timeout) + " -o BatchMode=yes -o StrictHostKeyChecking=no " + \
                 node.host + " \"" + command + "\""
             if (self.verbose): print full_command
             command_process = subprocess.Popen(full_command, shell=True)
