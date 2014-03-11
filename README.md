@@ -27,7 +27,7 @@ See `parallel_r.py --help` for more details.
 
 Kills all your R processes in all remote hosts:
 ```bash
-remote_command.py killall -s SIGKILL R
+remote_command.py "killall -s SIGKILL R"
 ```
 
 Extending

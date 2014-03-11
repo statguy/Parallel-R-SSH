@@ -2,7 +2,7 @@
 # By Jussi Jousimo, jvj@iki.fi
 #
 # To kill all remote R processes:
-# ./remote_command.py killall -s SIGKILL R
+# ./remote_command.py "killall -s SIGKILL R"
 
 import optparse
 import ukko_cluster
