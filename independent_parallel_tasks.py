@@ -96,8 +96,8 @@ class Cluster(object):
             for task_id, task_process, host in running_tasks:
                 return_code = task_process.poll()
                 if return_code is not None:
-                    print "Task " + str(task_id) + " at " + host + " terminated with return code " + str(return_code) + "."
                     running_tasks.remove((task_id, task_process, host))
+                    print "Task " + str(task_id) + " at " + host + " terminated with return code " + str(return_code) + ". " + str(len(running_tasks)) + " tasks left."
 
                     if return_code == 255: # Cannot reach host or cannot authenticate
                         print "*** UNABLE TO CONNECT TO HOST " + host + " FOR TASK " + str(task_id) + " ***"
@@ -141,6 +141,37 @@ class Cluster(object):
                 if return_code is not None:
                     running_commands.remove((host, command_process))
                     print host + " done with return code " + str(return_code) + "."
+            time.sleep(1)
+
+        return
+
+    def ping_task(self, host):
+        print "Pinging " + host + "..."
+
+        command = "ping -c 2 " + host
+        task_process = subprocess.Popen(command, shell=True)
+        running_tasks.append((0, task_process, host))
+
+        return
+
+    def ping(self, number_of_hosts):
+        available_hosts = [i.host for i in self.nodes]
+
+        n_new_tasks = min(number_of_hosts, len(available_hosts))
+        for i in range(0, n_new_tasks):
+            self.ping_task(available_hosts.pop())
+
+        while len(running_tasks) > 0:
+            for task_id, task_process, host in running_tasks:
+                return_code = task_process.poll()
+                if return_code is not None:
+                    running_tasks.remove((0, task_process, host))
+                    print "Ping terminated at " + host + " with return code " + str(return_code) + ". " + str(len(running_tasks)) + " hosts left."
+
+                    if return_code == 1: # No reply
+                        print "*** UNABLE TO REACH TO HOST " + host + " ***"
+                    elif return_code > 1: # Other error
+                        print "*** UNKNOWN ERROR REACHING HOST " + host + " ***"
             time.sleep(1)
 
         return
