@@ -11,6 +11,8 @@ def main():
     parser = optparse.OptionParser("usage: %prog command")
     (options, args) = parser.parse_args()
     command = " ".join(args)
+    if len(args) < 1:
+        parser.error("command must be suplied") 
 
     cluster = ukko_cluster.UkkoCluster(True)
     cluster.get_nodes()
