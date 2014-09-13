@@ -94,8 +94,6 @@ class Cluster(object):
         failed_hosts = []
 
         while len(running_tasks) > 0:
-            
-
             for task_id, task_process, host in running_tasks:
                 return_code = task_process.poll()
                 if return_code is not None:
@@ -117,6 +115,7 @@ class Cluster(object):
             if len(task_ids) > 0 and len(available_hosts) > 0:
                 self.run_task(task_ids.pop(), available_hosts.pop(), batch_file, arguments, log_file_dir, priority)
 
+            sys.stdout.flush()
             time.sleep(1)
         
         if len(task_ids) > 0:
@@ -145,6 +144,7 @@ class Cluster(object):
                 if return_code is not None:
                     running_commands.remove((host, command_process))
                     print host + " done with return code " + str(return_code) + "."
+            sys.stdout.flush()
             time.sleep(1)
 
         return
