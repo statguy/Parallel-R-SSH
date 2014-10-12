@@ -124,11 +124,11 @@ class Cluster(object):
             if len(task_ids) > 0 and len(available_hosts) > 0:
                 self.run_task(task_ids.pop(), available_hosts.pop(), batch_file, arguments, log_file_dir, priority)
 
-            if self.command.value is not "":
-                if self.command.value == "t":
+            if self.keych.value is not "":
+                if self.keych.value == "t":
                     for task_id, task_process, host in running_tasks:
                         print "Running task " + str(task_id) + " at " + host
-                elif self.comand.value == "k":
+                elif self.keych.value == "k":
                     for task_id, task_process, host in running_tasks:
                         print "Killing task " + str(task_id) + "..."
                         task_process.kill()
