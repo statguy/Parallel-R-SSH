@@ -5,9 +5,7 @@ import abc
 import subprocess
 import time
 import sys
-import getch_process
-#from multiprocessing import Manager, Value
-#from ctypes import c_char_p
+from ubkey import *
 
 running_tasks = []
     
@@ -36,12 +34,6 @@ class Cluster(object):
     
     def __init__(self, verbose):
         self.verbose = verbose
-
-        #self.manager = Manager()
-        #self.keych = self.manager.Value(c_char_p, "")
-        self.key_thread = getch_process.GetchProcess(getch_process.keych)
-        self.key_thread.start()
-
         return
     
     @abc.abstractmethod
@@ -124,21 +116,19 @@ class Cluster(object):
             if len(task_ids) > 0 and len(available_hosts) > 0:
                 self.run_task(task_ids.pop(), available_hosts.pop(), batch_file, arguments, log_file_dir, priority)
 
-            if getch_process.keych.value is not "":
-                if getch_process.keych.value == "t":
+            sys.stdout.flush()
+
+            chkey = getch()
+            if chkey >= 0:
+                if chkey == 116:
                     for task_id, task_process, host in running_tasks:
                         print "Running task " + str(task_id) + " at " + host
-                elif getch_process.keych.value == "k":
+                elif chkey == 107:
                     for task_id, task_process, host in running_tasks:
                         print "Killing task " + str(task_id) + "..."
                         task_process.kill()
                     return
 
-                getch_process.keych.value = ""
-                self.thread = getch_process.GetchProcess(getch_process.keych) # Awful hack, try to fix...
-                self.thread.start()
-
-            sys.stdout.flush()
             time.sleep(1)
         
         if len(task_ids) > 0:
