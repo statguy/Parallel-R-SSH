@@ -6,8 +6,8 @@ import subprocess
 import time
 import sys
 from getch_process import GetchProcess
-from multiprocessing import Manager, Value
-from ctypes import c_char_p
+#from multiprocessing import Manager, Value
+#from ctypes import c_char_p
 
 running_tasks = []
     
@@ -37,9 +37,9 @@ class Cluster(object):
     def __init__(self, verbose):
         self.verbose = verbose
 
-        self.manager = Manager()
-        self.keych = self.manager.Value(c_char_p, "")
-        self.key_thread = GetchProcess(self.keych)
+        #self.manager = Manager()
+        #self.keych = self.manager.Value(c_char_p, "")
+        self.key_thread = GetchProcess(keych)
         self.key_thread.start()
 
         return
@@ -124,18 +124,18 @@ class Cluster(object):
             if len(task_ids) > 0 and len(available_hosts) > 0:
                 self.run_task(task_ids.pop(), available_hosts.pop(), batch_file, arguments, log_file_dir, priority)
 
-            if self.keych.value is not "":
-                if self.keych.value == "t":
+            if keych.value is not "":
+                if keych.value == "t":
                     for task_id, task_process, host in running_tasks:
                         print "Running task " + str(task_id) + " at " + host
-                elif self.keych.value == "k":
+                elif keych.value == "k":
                     for task_id, task_process, host in running_tasks:
                         print "Killing task " + str(task_id) + "..."
                         task_process.kill()
                     return
 
-                self.keych.value = ""
-                self.thread = GetchProcess(self.keych)
+                keych.value = ""
+                self.thread = GetchProcess(keych)
                 self.thread.start()
 
             sys.stdout.flush()
