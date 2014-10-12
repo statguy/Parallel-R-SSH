@@ -8,12 +8,13 @@ import sys
 from ubkey import *
 
 running_tasks = []
-    
+
 def sigint_handler(signal, frame):
+    print "Ctrl+c detected, exiting..."
     for task_id, task_process, host in running_tasks:
         print "Killing task " + str(task_id) + "..."
         task_process.kill()
-    sys.exit(0)
+    sys.exit(-1)
 
 signal.signal(signal.SIGINT, sigint_handler)
 
@@ -126,20 +127,21 @@ class Cluster(object):
                 elif chkey == 107:
                     for task_id, task_process, host in running_tasks:
                         print "Killing task " + str(task_id) + " at " + host
+                        task_ids.append(task_id)
                         failed_hosts.append(host)
                         task_process.kill()
                     break
 
             time.sleep(1)
-        
+
         if len(task_ids) > 0:
             print "Failed to complete the tasks:"
-            print sorted(task_ids)
+            print str(sorted(task_ids)).strip('[]')
             print "on hosts:"
             print sorted(failed_hosts)
-            sys.exit(-1)
+            return -1
 
-        return
+        return 0
 
     # TODO: handle SIGNIT here too
     def run_command(self, command, timeout=10):
