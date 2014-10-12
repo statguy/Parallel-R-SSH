@@ -39,7 +39,7 @@ class Cluster(object):
 
         #self.manager = Manager()
         #self.keych = self.manager.Value(c_char_p, "")
-        self.key_thread = GetchProcess(keych)
+        self.key_thread = GetchProcess(getch_process.keych)
         self.key_thread.start()
 
         return
@@ -124,18 +124,18 @@ class Cluster(object):
             if len(task_ids) > 0 and len(available_hosts) > 0:
                 self.run_task(task_ids.pop(), available_hosts.pop(), batch_file, arguments, log_file_dir, priority)
 
-            if keych.value is not "":
-                if keych.value == "t":
+            if getch_process.keych.value is not "":
+                if getch_process.keych.value == "t":
                     for task_id, task_process, host in running_tasks:
                         print "Running task " + str(task_id) + " at " + host
-                elif keych.value == "k":
+                elif getch_process.keych.value == "k":
                     for task_id, task_process, host in running_tasks:
                         print "Killing task " + str(task_id) + "..."
                         task_process.kill()
                     return
 
-                keych.value = ""
-                self.thread = GetchProcess(keych)
+                getch_process.keych.value = ""
+                self.thread = GetchProcess(getch_process.keych)
                 self.thread.start()
 
             sys.stdout.flush()
