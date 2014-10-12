@@ -125,9 +125,10 @@ class Cluster(object):
                         print "Running task " + str(task_id) + " at " + host
                 elif chkey == 107:
                     for task_id, task_process, host in running_tasks:
-                        print "Killing task " + str(task_id) + "..."
+                        print "Killing task " + str(task_id) + " at " + host
+                        failed_hosts.append(host)
                         task_process.kill()
-                    return
+                    break
 
             time.sleep(1)
         
