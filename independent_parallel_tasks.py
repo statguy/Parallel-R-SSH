@@ -5,7 +5,7 @@ import abc
 import subprocess
 import time
 import sys
-import getch_process
+from getch_process import GetchProcess
 from multiprocessing import Manager, Value
 from ctypes import c_char_p
 
