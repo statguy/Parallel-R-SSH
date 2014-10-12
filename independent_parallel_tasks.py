@@ -38,7 +38,7 @@ class Cluster(object):
         self.verbose = verbose
 
         self.manager = Manager()
-        self.keych = manager.Value(c_char_p, "")
+        self.keych = self.manager.Value(c_char_p, "")
         self.key_thread = GetchProcess(self.keych)
         self.key_thread.start()
 
