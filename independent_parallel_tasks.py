@@ -5,7 +5,7 @@ import abc
 import subprocess
 import time
 import sys
-from getch_process import GetchProcess
+import getch_process
 #from multiprocessing import Manager, Value
 #from ctypes import c_char_p
 
@@ -39,7 +39,7 @@ class Cluster(object):
 
         #self.manager = Manager()
         #self.keych = self.manager.Value(c_char_p, "")
-        self.key_thread = GetchProcess(getch_process.keych)
+        self.key_thread = getch_process.GetchProcess(getch_process.keych)
         self.key_thread.start()
 
         return
@@ -135,7 +135,7 @@ class Cluster(object):
                     return
 
                 getch_process.keych.value = ""
-                self.thread = GetchProcess(getch_process.keych)
+                self.thread = getch_process.GetchProcess(getch_process.keych) # Awful hack, try to fix...
                 self.thread.start()
 
             sys.stdout.flush()
