@@ -1,5 +1,9 @@
-from multiprocessing import Process
+from multiprocessing import Manager, Value, Process
+from ctypes import c_char_p
 import getch
+
+manager = Manager()
+global keych = manager.Value(c_char_p, "")
 
 class GetchProcess(Process):
     def __init__(self, keych):
