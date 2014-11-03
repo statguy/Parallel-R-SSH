@@ -13,7 +13,8 @@ class UkkoCluster(independent_parallel_tasks.Cluster):
         (yes|no) \s+  # ssh
         ([0-9]+) \s+  # users
         (?:([0-9]+\.[0-9]+)|-) \s+  # load
-        (cs|rr|ok)(?:/t)? \s+  # stat
+        (?:([0-9]+)|-) \s+          # freeMB
+        (cs|rr|ok)(?:/t)? \s+       # stat
         (N/A|[0-9.-]+-(?:generic|server))? \s+  # kernel
         ([0-9.]+|--) \s*  # BIOS
         (.*?) \s* $
@@ -31,7 +32,7 @@ class UkkoCluster(independent_parallel_tasks.Cluster):
         for l in f:
             m = self.entry.match(l)
             if m is not None:
-                host, slot, ping, ssh, users, load, stat, kernel, bios, comment = m.groups()
+                host, slot, ping, ssh, users, load, freeMB, stat, kernel, bios, comment = m.groups()
                 if stat != 'ok' and stat != 'cs':
                     continue
                 if ping != 'yes' or ssh != 'yes' or load is None:
