@@ -22,7 +22,7 @@ class Node(object):
     def __init__(self, host, load, free_mem):
         self.host = host
         self.load = float(load)
-        self.free_mem = free_mem
+        self.free_mem = int(free_mem or 0)
 
     def __lt__(self, other):
         return self.load < other.load
@@ -51,8 +51,10 @@ class Cluster(object):
 
         retain_index = []
         for i in range(len(self.nodes)):
+            print i, self.nodes[i]
             if (self.nodes[i].load <= max_load and self.nodes[i].free_mem > min_free_mem):
                 retain_index.append(i)
+                print "RETAIN"
             if (len(retain_index) == max_nodes):
                 break
 
