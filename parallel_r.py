@@ -11,7 +11,7 @@ def main():
     parser.add_option("-t", "--task_ids", metavar="TASKS", dest="task_items_str", type="string", help="list of task ids to execute, e.g. 1:10,14,20")
     parser.add_option("-n", "--max_nodes", metavar="NODES", dest="max_nodes", default=2, type="int", help="maximum number nodes to allocate")
     parser.add_option("-l", "--max_load", metavar="LOAD", dest="max_load", default=10.0, type="float", help="maximum load in nodes for allocation")
-    parser.add_option("-m", "--min_mem", metavar="MEMORY", dest="min_freeMB", default=0, type="int", help="minimum free memory in nodes for allocation")
+    parser.add_option("-m", "--min_mem", metavar="MEMORY", dest="min_free_mem", default=0, type="int", help="minimum free memory in nodes for allocation")
     parser.add_option("-f", "--log_dir", metavar="DIR", dest="log_file_dir", default="~/tmp", type="string", help="directory to write log files")
     parser.add_option("-b", "--blacklist", metavar="FILE", dest="blacklist_file", type="string", help="file of blacklisted nodes")
     parser.add_option("-p", "--priority", metavar="PRIORITY", dest="priority", default=10, type="int", help="nice priority")    
@@ -33,7 +33,7 @@ def main():
 
     if options.task_items_str is None:
         print "Argument -t TASKS not specified, priting only available clusters:"
-        cluster.get_nodes(options.max_nodes, options.max_load, options.min_freeMB, blacklist)
+        cluster.get_nodes(options.max_nodes, options.max_load, options.min_free_mem, blacklist)
         print cluster.nodes
     else:
         task_items = options.task_items_str.split(",")
@@ -49,7 +49,7 @@ def main():
             print "Some task ids occur multiple times."
             sys.exit(-1)
         
-        cluster.get_nodes(options.max_nodes, options.max_load, options.min_freeMB, blacklist)
+        cluster.get_nodes(options.max_nodes, options.max_load, options.min_free_mem, blacklist)
         cluster.run_tasks(task_ids, batch_file, arguments, options.log_file_dir, options.priority)
 
     return

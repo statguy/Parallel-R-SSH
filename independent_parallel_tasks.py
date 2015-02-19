@@ -19,16 +19,16 @@ def sigint_handler(signal, frame):
 signal.signal(signal.SIGINT, sigint_handler)
 
 class Node(object):
-    def __init__(self, host, load, freeMB):
+    def __init__(self, host, load, free_mem):
         self.host = host
         self.load = float(load)
-        self.freeMB = freeMB
+        self.free_mem = free_mem
 
-    #def __lt__(self, other):
-    #    return self.load < other.load and self.freeMB < other.freeMB
+    def __lt__(self, other):
+        return self.load < other.load
 
     def __repr__(self):
-        return "%s, %s, %s" % (self.host, self.load, self.freeMB)
+        return "%s, %s, %s" % (self.host, self.load, self.free_mem)
 
 class Cluster(object):
     __metaclass__ = abc.ABCMeta
@@ -42,26 +42,40 @@ class Cluster(object):
     def get_remote_nodes(self):
         return
 
-    def filter_nodes(self, max_nodes, max_load, min_freeMB, blacklist):
+    def filter_nodes(self, max_nodes, max_load, min_free_mem, blacklist):
         if (len(blacklist) > 0):
             if (self.verbose): print "Blacklisted nodes: " + " ".join(blacklist)
             self.nodes[:] = (i for i in self.nodes if i.host not in blacklist)
 
-        number_of_nodes = len(self.nodes)
-        if (number_of_nodes > max_nodes):
-            number_of_nodes = max_nodes
-    
         self.nodes.sort()
-        for i in range(0, number_of_nodes):
-            if (self.nodes[i].load > max_load or self.nodes[i].freeMB <= min_freeMB):
-                number_of_nodes = i
-                break
-        
-        self.nodes = self.nodes[0:number_of_nodes]
 
-    def get_nodes(self, max_nodes=sys.maxsize, max_load=sys.maxsize, min_freeMB=0, blacklist=[]):
+        retain_index = []
+        for i in range(len(self.nodes)):
+            if (self.nodes[i].load <= max_load and self.nodes[i].free_mem > min_free_mem):
+                retain_index.append(i)
+            if (len(retain_index) == max_nodes):
+                break
+
+        self.nodes = [self.nodes[i] for i in retain_index]
+
+        #self.nodes = self.nodes[retain_index]
+
+        #number_of_nodes = len(self.nodes)
+        #if (number_of_nodes > max_nodes):
+        #    number_of_nodes = max_nodes
+    
+        #self.nodes.sort()
+        #for i in range(number_of_nodes):
+        #    print self.nodes[i]
+        #    if (self.nodes[i].load > max_load or self.nodes[i].free_mem <= min_free_mem):
+        #        number_of_nodes = i
+        #        break
+        
+        #self.nodes = self.nodes[0:number_of_nodes]
+
+    def get_nodes(self, max_nodes=sys.maxsize, max_load=sys.maxsize, min_free_mem=0, blacklist=[]):
         self.get_remote_nodes()
-        self.filter_nodes(max_nodes, max_load, min_freeMB, blacklist)
+        self.filter_nodes(max_nodes, max_load, min_free_mem, blacklist)
         if (len(self.nodes) == 0):
             print "No cluster nodes available."
             sys.exit(-1)
