@@ -51,10 +51,8 @@ class Cluster(object):
 
         retain_index = []
         for i in range(len(self.nodes)):
-            print i, self.nodes[i]
             if (self.nodes[i].load <= max_load and self.nodes[i].free_mem > min_free_mem):
                 retain_index.append(i)
-                print "RETAIN"
             if (len(retain_index) == max_nodes):
                 break
 
