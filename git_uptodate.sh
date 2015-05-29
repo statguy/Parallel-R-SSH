@@ -7,13 +7,13 @@
 
 if ! git rev-parse --git-dir > /dev/null 2>&1; then
     echo "No git repository found in this directory"
-    exit -2
+    exit 2
 fi
 
 NAME=$(basename `git rev-parse --show-toplevel`)
-LOCAL=$(git rev-parse @)
+LOCAL=$(git rev-parse @{0})
 REMOTE=$(git rev-parse @{u})
-BASE=$(git merge-base @ @{u})
+BASE=$(git merge-base @{0} @{u})
 
 if [ $LOCAL = $REMOTE ]; then
     echo "Repository $NAME up-to-date"
@@ -26,4 +26,4 @@ else
     echo "Repository $NAME diverged"
 fi
 
-exit -1
+exit 1
