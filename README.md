@@ -30,6 +30,18 @@ Kills all your R processes in all remote hosts:
 remote_command.py "killall -s SIGKILL R"
 ```
 
+Files on cluster nodes
+----------------------
+Since the file system may not be up-to-date due to caching mechanism of NFS, there is a script
+that checks if a local git repository matches remote. The script can be run inside a shell script
+like this:
+````bash
+if ! "$exec_path"/git_uptodate.sh; then
+  exit
+fi
+```
+in the repository directory. Variable `$exec_path` points to the parallel tasks directory.
+
 Extending
 ---------
 The Python class in `independent_parallel_tasks.py` can be extended for custom HP clusters,
@@ -39,6 +51,10 @@ TODO
 ----
 * Allow specifying remote username, port, nice parameter, etc.
 * Allow running other programs than R.
+
+FIXME
+-----
+* Replace popen with thread pooling.
 
 Feedback
 --------
