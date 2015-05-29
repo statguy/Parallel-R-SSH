@@ -119,7 +119,7 @@ class Cluster(object):
                 return_code = task_process.poll()
                 if return_code is not None:
                     running_tasks.remove((task_id, task_process, host))
-                    print "Task " + str(task_id) + " at " + host + " terminated with return code " + str(return_code) + ". " + str(len(running_tasks)) + " tasks left."
+                    print "Task " + str(task_id) + " at " + host + " terminated with return code " + str(return_code) + ". " + str(len(running_tasks)) + " tasks being processed, " + str(len(task_ids)) + " tasks in queue."
 
                     if return_code == 255: # Cannot reach host or cannot authenticate
                         print "*** UNABLE TO CONNECT TO HOST " + host + " FOR TASK " + str(task_id) + " ***"
